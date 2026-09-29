@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Retrieved but Not Delivered</title>
+  <meta name="description" content="Between retrieving a memory and answering from it sits a stage that multimodal memory evaluations do not isolate: what of the retrieved memory reaches the model, and in what form. We call it delivery." />
+  <meta property="og:title" content="Retrieved but Not Delivered: Multimodal Memory Delivery for Long-Term Agents" />
+  <meta property="og:description" content="With the retrieved set held fixed, delivering the original pixels raises accuracy by 13.87 points; making retrieval perfect adds 2.31." />
+  <meta property="og:image" content="static/img/salmon_pixels.jpg" />
+  <meta name="theme-color" content="#c7000b" />
+  <meta name="author" content="Yuhang Jiang, Qingwei Liao, Kaize Yin, Xingling Liu, Luca Cuomo, Silvio Bacci" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c7000b'/%3E%3Cpath d='M9 8h7a8 8 0 010 16H9z' fill='none' stroke='white' stroke-width='3'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="static/css/style.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <a class="brand" href="#top">Deliver<span>Mem</span></a>
+    <ul>
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#decomposition">Decomposition</a></li>
+      <li><a href="#method">Method</a></li>
+      <li><a href="#controls">Controls</a></li>
+      <li><a href="#where">Where it helps</a></li>
+      <li><a href="#results">Results</a></li>
+      <li><a href="#bibtex">BibTeX</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="container">
+    <span class="eyebrow">Multimodal agent memory &middot; Training-free</span>
+    <h1>Retrieved but Not <span class="red">Delivered</span></h1>
+    <p class="subtitle">Multimodal Memory Delivery for Long-Term Agents</p>
+    <p class="authors" id="authors">
+      <span><a href="https://avalon-s.github.io/" target="_blank" rel="noopener">Yuhang Jiang</a><sup>*</sup></span>,
+      <span>Qingwei Liao</span>, <span>Kaize Yin</span>, <span>Xingling Liu</span>,
+      <span>Luca Cuomo</span>, <span>Silvio Bacci</span>
+    </p>
+    <p class="affil" id="affil">Huawei Technologies Ltd.</p>
+    <p class="anote"><sup>*</sup>Corresponding author, <a href="mailto:jyhtjtj@gmail.com">jyhtjtj@gmail.com</a>.
+      Work done during a research internship at Huawei Pisa Research Center.</p>
+    <div class="btns">
+      <a class="btn btn-primary" href="https://arxiv.org/abs/2609.32590" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16v2H4zm0 7h16v2H4zm0 7h10v2H4z"/></svg>arXiv</a>
+      <span class="btn soon" title="Code will be released on publication">
+        <svg viewBox="0 0 24 24"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.4 11.4 0 016 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0023.5 12C23.5 5.7 18.3.5 12 .5z"/></svg>Code <span class="tag">on publication</span></span>
+      <a class="btn" href="#bibtex">
+        <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6V2zm8 1.5V8h4.5L14 3.5zM8 12h8v1.6H8zm0 3.5h8v1.6H8z"/></svg>BibTeX</a>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="stats" id="stats"></div>
+</div>
+
+<section class="block">
+  <div class="container narrow">
+    <div class="card tldr">
+      Memory for multimodal agents is optimised for what it writes, updates and retrieves. Between
+      retrieval and the answer sits a stage that multimodal memory evaluations do not isolate:
+      what of the retrieved memory reaches the model, and in what form. We call it
+      <strong>delivery</strong>. With the retrieved messages held fixed, delivering the original
+      pixels instead of withholding them raises accuracy by 13.87 points, while making retrieval
+      perfect adds 2.31. <strong>DeliverMem</strong> makes three delivery decisions explicit, trains
+      nothing, and one fixed configuration leads both benchmarks we test.
+    </div>
+    <details class="abstract">
+      <summary>Read the abstract</summary>
+      <p>Work on memory for multimodal agents optimizes what is written, updated and retrieved.
+      Between retrieval and the answer, however, is a stage that multimodal memory evaluations do
+      not isolate: what of the retrieved memory reaches the model, and in what form. We call it
+      delivery, and a controlled decomposition on MemLens locates the remaining room there.
+      With the retrieved evidence set exactly fixed, delivering the original pixels instead of
+      withholding them raises accuracy by 13.87 points on an 8B backbone, whereas making retrieval
+      perfect on those same messages improves it by 2.31. Delivery is the larger term on all
+      three MemLens backbones and grows with backbone strength; retrieval grows too, without closing
+      the gap. We propose <strong>DeliverMem</strong>, an instantiation of delivery as three decisions:
+      keep the original modality, give each item a readable identity, and state when it was seen,
+      with a retrieval-side adapter for the one property delivery cannot supply. Each is measured
+      against a delivery-matched control that alters only its own variable. DeliverMem leads
+      the strongest published memory agent on MemLens at all four context lengths, and beats
+      DMV-Bench's own strongest method at every setting on both backbones. On MemLens it does this on
+      a tenth to a seventieth of the input. Each decision helps only where the question lacks what it
+      supplies, and is null elsewhere. A single fixed configuration nonetheless leads both benchmarks,
+      without training any component or modifying the stored records.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ─────────────────────────── the problem ─────────────────────────── -->
+<section class="block alt" id="problem">
+  <div class="container">
+    <div class="kicker">The problem</div>
+    <h2>Retrieval found the message. The answer still turned on how it arrived.</h2>
+    <p class="lede">A user testing a citrus-cured salmon recipe sends their AI assistant a photograph.
+      Later comes a question about it. Nothing the user wrote mentions the answer; the photograph
+      shows it. The exchange is from MemLens, a benchmark of questions about long multimodal
+      conversations. Retrieval finds the message and places it in the prompt. Switch what reaches
+      the model.</p>
+    <div class="seg-wrap">
+      <div class="seg" role="group" aria-label="What is delivered">
+        <button type="button" data-mode="withheld" aria-pressed="false">Pixels withheld</button>
+        <button type="button" data-mode="delivered" aria-pressed="true">Pixels delivered</button>
+      </div>
+    </div>
+    <div class="example">
+      <div class="card ctx">
+        <div class="lbl">The retrieved message, as delivered</div>
+        <div class="msg">Trying to get this recipe write-up done before I crash tonight. I took a photo
+          while I was testing my citrus-cured salmon and &hellip;</div>
+        <div class="pix on" id="pix">
+          <img src="static/img/salmon_pixels.jpg" alt="The photograph attached to the message: two pieces of cured salmon on a wooden board." />
+          <div class="empty">pixels not delivered<br /><span>the message text arrives on its own</span></div>
+        </div>
+      </div>
+      <div class="card qa">
+        <div class="lbl">Question</div>
+        <div class="q">Where does the smaller chunk of salmon sit compared to the main fillet?</div>
+        <div class="gold">Gold answer: <b>To the right</b></div>
+        <div class="lbl" style="margin:6px 0 -4px">Qwen3-VL-8B answers</div>
+        <div class="answer right" data-for="delivered">
+          <span class="mark">&#10003;</span>
+          <span>To the right of the main fillet.<small>with the pixels</small></span>
+        </div>
+        <div class="answer wrong" data-for="withheld">
+          <span class="mark">&#10007;</span>
+          <span>On top of the main fillet.<small>the same message without its pixels: confident, and wrong</small></span>
+        </div>
+        <p class="fine">Same retrieved message, same text, same model and judge; only the delivery
+          differs. Of the 31 questions the pixels fix, 10 fail the way this one does when the pixels
+          are withheld: a confident wrong answer, not a refusal.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── decomposition ─────────────────────────── -->
+<section class="block" id="decomposition">
+  <div class="container">
+    <div class="kicker">A controlled decomposition</div>
+    <h2>Hold the retrieved set fixed. Delivery is the larger term.</h2>
+    <p class="lede">On MemLens (32K, 173 non-refusal questions) we vary one argument at a time from
+      the same corner, where retrieval is perfect and the pixels are delivered. Both quantities start
+      from what systems do today, text-only delivery and a query-conditioned retriever, and only
+      retrieval runs all the way to a ceiling. Hover a quantity.</p>
+    <div class="decomp">
+      <div class="card">
+        <div class="grid22" id="grid22"></div>
+      </div>
+      <div class="deltas" id="deltas"></div>
+    </div>
+
+    <div class="card chart-card" style="margin-top:22px">
+      <h3 style="margin:2px 0 2px;text-align:center;font-size:18px">On three answering models</h3>
+      <p class="note" style="margin:0 0 6px">Same questions, retrieval index, K and judge; only the answering model changes.</p>
+      <div class="legend">
+        <span><i style="background:var(--red)"></i>delivery: pixels delivered vs withheld</span>
+        <span><i style="background:var(--char)"></i>retrieval: gold messages vs our retriever</span>
+      </div>
+      <div class="chart" id="c-scale"></div>
+      <p class="note">The gap between the two terms separates at 8B (p=0.0078) and keeps its sign on the
+        two larger models without separating at n=173 (p=0.18 and 0.14).</p>
+    </div>
+    <div class="callout"><span class="dot"></span><div>A small retrieval term does not mean retrieval is
+      solved: <b>selecting the ten messages without the query costs 27 to 34 points</b> at an identical
+      budget. The room that remains is on delivery's side.</div></div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── the stage ─────────────────────────── -->
+<section class="block alt" id="stage">
+  <div class="container">
+    <div class="kicker">The stage</div>
+    <h2>What the model actually sees, and in what form</h2>
+    <p class="lede">A memory system writes experience to a store, a retriever returns a small set of
+      records per query, and the answering model conditions on them. Between the last two is a step that
+      turns retrieved records into the tokens and pixels placed in the prompt.</p>
+    <div class="pipe">
+      <div class="node plain"><div class="tagline"></div><div class="box">Experience</div></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node"><div class="tagline"></div><div class="box">Write</div></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node"><div class="tagline"></div><div class="box">Store</div></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node ret"><div class="tagline">(R1)</div><div class="box">Retrieve<small>which memories are accessible</small></div></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node ours"><div class="tagline">(D1) (D2) (D3)</div><div class="box">Deliver<small>which information in them is usable</small></div></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node plain"><div class="tagline"></div><div class="box">Model</div></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node plain"><div class="tagline"></div><div class="box">Answer</div></div>
+    </div>
+    <div class="brackets">
+      <div class="brk theirs">existing work concentrates here</div>
+      <div class="brk mine">this paper</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── method ─────────────────────────── -->
+<section class="block" id="method">
+  <div class="container">
+    <div class="kicker">DeliverMem</div>
+    <h2>Three delivery decisions and one retrieval adapter. Nothing is trained.</h2>
+    <p class="lede">The failures we audited lack three properties: the model has to be able to
+      inspect what a memory contains, to address one item among those delivered, and
+      to situate it in time. Each decision is measured against a delivery-matched control
+      that alters only its own variable.</p>
+    <div class="decisions" id="decisions"></div>
+
+    <div class="card render">
+      <img src="static/img/salmon_delivermem.jpg" alt="The same photograph as DeliverMem delivers it, with the tag M1 stamped into its top-left corner." />
+      <div>
+        <h3>The same memory, as DeliverMem delivers it</h3>
+        <p>The tag is written into the delivered copy after the embeddings, so it costs no re-embedding
+          and leaves the stored record untouched. The date comes from the store's own timestamp.</p>
+<pre><span class="hl">Each recalled item carries its own tag (M1, M2, ...).</span> The tag gives the relevance rank: M1 is the most relevant, M2 the next, and so on. Identify a memory by its tag, not by counting items.
+
+<span class="hl">[2024/05/11 (Sat) 19:33]</span> Trying to get this recipe write-up done before I crash tonight. I took a photo while I was testing my citrus-cured salmon and ...
+<span class="hl">&lt;the stored photograph, with M1 stamped in its top-left corner&gt;</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── controls ─────────────────────────── -->
+<section class="block alt" id="controls">
+  <div class="container">
+    <div class="kicker">Delivery-matched controls</div>
+    <h2>It is the content of the pixels, not the image tokens</h2>
+    <p class="lede">Withholding the pixels also removes image tokens. A ladder of counterfactual images
+      keeps an identical set of image slots and changes only what the pixels carry. Each tile shows the
+      points lost against the correct image. Pick one.</p>
+    <div class="ladder" id="ladder"></div>
+    <div class="readout" id="ladderReadout"></div>
+
+    <div class="card" style="margin-top:30px">
+      <h3 style="margin:0 0 4px;font-size:18px">Every component against its own control</h3>
+      <p class="note left" style="margin:0 0 12px">MemLens rows pair questions; DMV-Bench rows count chains agreeing in sign.</p>
+      <div class="tbl-wrap"><table class="tbl" id="ctlTable"></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── where it helps ─────────────────────────── -->
+<section class="block" id="where">
+  <div class="container">
+    <div class="kicker">Where each decision helps</div>
+    <h2>Each decision helps only where the question lacks what it supplies</h2>
+    <p class="lede">A delivery decision helps where three conditions hold, and is null otherwise. Every
+      null we measure is one of them failing, and no decision measured on both benchmarks is positive on
+      both.</p>
+    <div class="rules">
+      <div class="card rule"><div class="n">(i)</div><p>The information survives storage and reaches the model.</p></div>
+      <div class="card rule"><div class="n">(ii)</div><p>The question needs the property the decision supplies.</p></div>
+      <div class="card rule"><div class="n">(iii)</div><p>The delivered context does not already carry it.</p></div>
+    </div>
+    <div class="matrix" id="matrix"></div>
+    <div class="fig-two">
+      <div>
+        <h3 style="margin:0 0 8px;font-size:19px">Why the two benchmarks disagree</h3>
+        <p>A DMV-Bench question asks which of several retrieved frames contains the cue. A name for each
+          frame answers it directly, and an ordinal adds nothing. A MemLens temporal question asks when
+          something happened: it needs the date, and a name for each item does not supply one.</p>
+        <p>The retrieval adapter targets a small image region, and only DMV-Bench is built that way: its
+          cue occupies a median 1.7% of the frame. On the right, one cued frame ranks 127th of 1,000 under
+          the whole-image encoding and first under the 2&times;2 encoding.</p>
+      </div>
+      <figure><img src="static/img/region.png" alt="One DMV-Bench frame with its small inserted cue, the overlapping tiles and the tile MaxSim picks, and Recall@1 at four granularities." loading="lazy" /></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── results ─────────────────────────── -->
+<section class="block alt" id="results">
+  <div class="container">
+    <div class="kicker">Results</div>
+    <h2>Ahead of every published memory agent, at every setting</h2>
+    <p class="lede">One configuration, applied to every question with no selection. All seven published
+      memory agents on MemLens run on 8B parameters or fewer; on DMV-Bench the reference is the
+      benchmark's own strongest method.</p>
+    <div class="two">
+      <div class="card chart-card">
+        <h3>MemLens</h3>
+        <p class="sub">Accuracy by context length (canonical 195 questions, benchmark judge).</p>
+        <div class="legend">
+          <span><i style="background:var(--red)"></i>DeliverMem (Qwen3-VL-8B, ten messages)</span>
+          <span><i style="background:var(--char)"></i>Qwen3-VL-8B reading everything</span>
+          <span><i style="background:var(--grey)"></i>best published agent</span>
+        </div>
+        <div class="chart" id="c-memlens"></div>
+      </div>
+      <div class="card chart-card">
+        <h3>DMV-Bench</h3>
+        <p class="sub">Task success rate as the number of sessions in memory grows.</p>
+        <div class="seg-wrap" style="margin-bottom:8px">
+          <div class="seg" role="group" aria-label="Backbone" id="dmvSeg">
+            <button type="button" data-bb="qwen" aria-pressed="true">Qwen2.5-VL-7B</button>
+            <button type="button" data-bb="gemini" aria-pressed="false">Gemini 2.5 Flash</button>
+          </div>
+        </div>
+        <div class="legend">
+          <span><i style="background:var(--red)"></i>DeliverMem</span>
+          <span><i style="background:var(--char)"></i>DualMem</span>
+          <span><i style="background:var(--grey)"></i>other published baselines</span>
+        </div>
+        <div class="chart" id="c-dmv"></div>
+      </div>
+    </div>
+    <div class="callout"><span class="dot"></span><div>Of the 36 questions behind the MemLens 32K margin,
+      19 are refusal questions, which our pipeline answers correctly even with the pixels withheld. <b>On
+      the other 173 the margin is +9.83 points.</b> On DMV-Bench the margin is the whole interface,
+      delivery and retrieval together, and the retrieval adapter carries most of it.</div></div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── cost ─────────────────────────── -->
+<section class="block" id="cost">
+  <div class="container">
+    <div class="kicker">Cost</div>
+    <h2>A tenth to a seventieth of the input</h2>
+    <p class="lede">What we deliver barely moves as the conversation grows, 2,405 to 2,450 tokens across
+      a 7.4&times; increase. Against the same backbone reading the entire conversation we are ahead by
+      0.51 at 32K and by 7.69 at 128K, and behind by 3.59 at 64K.</p>
+    <div class="card chart-card">
+      <div class="legend">
+        <span><i style="background:var(--red)"></i>tokens DeliverMem delivers</span>
+        <span><i style="background:var(--grey)"></i>tokens in the full conversation</span>
+      </div>
+      <div class="chart" id="c-cost"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── failure ─────────────────────────── -->
+<section class="block alt" id="failure">
+  <div class="container">
+    <div class="kicker">Failure analysis</div>
+    <h2>The agent names the cue, then opens the wrong item</h2>
+    <p class="lede">On DMV-Bench with Qwen2.5-VL-7B, 98% of our failures picked a neighbour while the
+      correct item was in context, and in 94% of those the agent's own reasoning trace names the target
+      correctly. The errors are attributions to the wrong item in context, and (D2) gives each item a
+      readable name.</p>
+    <figure>
+      <img src="static/img/failcase.png" alt="Five delivered product images; the target is the second, but the agent's trace attributes the yellow mug to the first image and the agent opens it." loading="lazy" />
+      <figcaption>One worked failure from the constant-tag control, where every delivered image carries the
+        same symbol: the target is second, the trace attributes the cue to the first image, and the agent
+        opens it. The box marks the cue, located by differencing the frame against its uncued original.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ─────────────────────────── limits ─────────────────────────── -->
+<section class="block" id="limits">
+  <div class="container narrow">
+    <div class="kicker">Scope</div>
+    <h2>Where the results apply</h2>
+    <ul class="limits">
+      <li><b>Images.</b> Every measurement is on images. Audio and video will bring decisions of
+        their own: a recording must also say where within it, and an hour of audio cannot be delivered
+        whole.</li>
+      <li><b>Granularity.</b> Whether to send a crop, the whole frame or both is a degree of freedom
+        left to a benchmark with region annotations.</li>
+      <li><b>Binding.</b> Which image follows which message matters, measured at +6.36, and stays
+        outside the interface.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ─────────────────────────── bibtex ─────────────────────────── -->
+<section class="block alt" id="bibtex">
+  <div class="container narrow">
+    <div class="kicker">Citation</div>
+    <h2>BibTeX</h2>
+    <div class="bib">
+      <button class="btn copy" id="copyBib" type="button">Copy</button>
+<pre id="bibText">@misc{jiang2026retrieveddeliveredmultimodalmemory,
+      title={Retrieved but Not Delivered: Multimodal Memory Delivery for Long-Term Agents},
+      author={Yuhang Jiang and Qingwei Liao and Kaize Yin and
+              Xingling Liu and Luca Cuomo and Silvio Bacci},
+      year={2026},
+      eprint={2609.32590},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2609.32590},
+}</pre>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="bar"></div>
+    &copy; 2026 <a href="https://avalon-s.github.io/" target="_blank" rel="noopener">Yuhang Jiang</a>, Qingwei Liao,
+    Kaize Yin, Xingling Liu, Luca Cuomo, Silvio Bacci &middot; Huawei
+  </div>
+</footer>
+
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script src="static/data/data.js"></script>
+<script src="static/js/app.js"></script>
+</body>
+</html>
