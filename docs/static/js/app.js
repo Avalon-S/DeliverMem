@@ -347,6 +347,91 @@
     draw();
   })();
 
+  // ── full results, behind a toggle ───────────────────────────────────────
+  (function boards() {
+    var btn = $("boardBtn"), panel = $("boards");
+    btn.addEventListener("click", function () {
+      var open = !panel.classList.contains("open");
+      panel.classList.toggle("open", open);
+      btn.setAttribute("aria-expanded", String(open));
+      btn.firstChild.nodeValue = open ? "Hide all results " : "Show all results ";
+    });
+
+    function nums(tr, vals, best, d) {
+      vals.forEach(function (v, i) {
+        var c = h("td", "num" + (v != null && v === best[i] ? " best" : ""), v == null ? "n/a" : v.toFixed(d));
+        if (v == null) c.className += " muted";
+        tr.appendChild(c);
+      });
+    }
+    function colMax(list, key) {
+      return list[0][key].map(function (_, i) {
+        return Math.max.apply(null, list.map(function (s) { return s[key][i] == null ? -1 : s[key][i]; }));
+      });
+    }
+    function sys(name, sub) { return h("td", "sys", name + (sub ? "<small>" + sub + "</small>" : "")); }
+    function mean(v) { var a = v.filter(function (x) { return x != null; }); return a.reduce(function (s, x) { return s + x; }, 0) / a.length; }
+
+    // MemLens: memory agents ranked by their mean over the four lengths; direct LVLMs listed apart,
+    // since they read the whole conversation and the benchmark does not run them at 256K.
+    var M = D.memlens, t = $("lbMemlens"), ncol = 2 + M.lengths.length;
+    t.innerHTML = "<thead><tr><th></th><th>System</th>" +
+      M.lengths.map(function (l) { return "<th class='num'>" + l + "</th>"; }).join("") + "</tr></thead>";
+    var tb = h("tbody");
+    var mem = M.agents.map(function (a) { return { name: a.name, sub: a.backbone + " · reads " + a.reads, s: a.scores }; });
+    mem.push({ name: "DeliverMem", sub: "Qwen3-VL-8B · reads ten retrieved messages, with their pixels", s: M.ours, ours: true });
+    mem.sort(function (a, b) { return mean(b.s) - mean(a.s); });
+    var g1 = h("tr", "grp"); g1.appendChild(h("td", "", "Memory agents")).colSpan = ncol; tb.appendChild(g1);
+    var b1 = colMax(mem, "s");
+    mem.forEach(function (r, k) {
+      var tr = h("tr", r.ours ? "ours" : "");
+      tr.appendChild(h("td", "rk", String(k + 1)));
+      tr.appendChild(sys(r.name, r.sub));
+      nums(tr, r.s, b1, 2);
+      tb.appendChild(tr);
+    });
+    var g2 = h("tr", "grp");
+    g2.appendChild(h("td", "", "Direct LVLMs <span>· read the entire conversation, " + M.ratio[0].toFixed(0) + "× to " +
+      M.ratio[2].toFixed(0) + "× our input; not run at 256K</span>")).colSpan = ncol;
+    tb.appendChild(g2);
+    var b2 = colMax(M.lvlms, "scores");
+    M.lvlms.forEach(function (r) {
+      var tr = h("tr");
+      tr.appendChild(h("td", "rk", ""));
+      tr.appendChild(sys(r.name, r.own ? "our backbone" : ""));
+      nums(tr, r.scores, b2, 2);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+
+    // DMV-Bench: the benchmark's whole pool on both backbones, ranked by the mean over all eight cells.
+    var S = D.dmv.systems, J = D.dmv.J, u = $("lbDmv");
+    var head = "<thead><tr><th rowspan='2'></th><th rowspan='2'>System</th>" +
+      "<th class='grp-h' colspan='" + J.length + "'>Qwen2.5-VL-7B</th><th class='grp-h' colspan='" + J.length + "'>Gemini 2.5 Flash</th></tr><tr>";
+    for (var k = 0; k < 2; k++) J.forEach(function (j) { head += "<th class='num'>J = " + j + "</th>"; });
+    u.innerHTML = head + "</tr></thead>";
+    var rowsD = S.map(function (s) { return { name: s.name, v: s.qwen.concat(s.gemini) }; });
+    rowsD.sort(function (a, b) { return mean(b.v) - mean(a.v); });
+    var bd = colMax(rowsD, "v"), ub = h("tbody"), rank = 0, last = null;
+    rowsD.forEach(function (r, i) {
+      var m = mean(r.v);
+      if (m !== last) { rank = i + 1; last = m; }
+      var tr = h("tr", r.name === "DeliverMem" ? "ours" : "");
+      tr.appendChild(h("td", "rk", String(rank)));
+      tr.appendChild(sys(r.name, ""));
+      nums(tr, r.v, bd, 1);
+      ub.appendChild(tr);
+    });
+    var ours = rowsD.filter(function (r) { return r.name === "DeliverMem"; })[0].v;
+    var prev = colMax(rowsD.filter(function (r) { return r.name !== "DeliverMem"; }), "v");
+    var dl = h("tr", "delta");
+    dl.appendChild(h("td", "", ""));
+    dl.appendChild(h("td", "sys", "&Delta; over previous best"));
+    ours.forEach(function (v, i) { dl.appendChild(h("td", "num", signed(v - prev[i], 1))); });
+    ub.appendChild(dl);
+    u.appendChild(ub);
+  })();
+
   // ── input cost ──────────────────────────────────────────────────────────
   (function cost() {
     var M = D.memlens, W = 1000, L = 90, R = 150, T = 10, gh = 64, bh = 18;

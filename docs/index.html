@@ -319,6 +319,27 @@
       19 are refusal questions, which our pipeline answers correctly even with the pixels withheld. <b>On
       the other 173 the margin is +9.83 points.</b> On DMV-Bench the margin is the whole interface,
       delivery and retrieval together, and the retrieval adapter carries most of it.</div></div>
+    <div class="board-toggle">
+      <button class="btn ghost" id="boardBtn" type="button" aria-expanded="false" aria-controls="boards">
+        Show all results <span class="chev" aria-hidden="true">&#9662;</span></button>
+    </div>
+    <div class="boards" id="boards">
+      <div class="card board">
+        <h3>MemLens</h3>
+        <p class="sub">Accuracy (%) on the canonical 195 questions with the benchmark's judge. Published rows are as
+          reported by MemLens. Memory agents are ranked by their mean over the four lengths; bold marks the best
+          in each group.</p>
+        <div class="tbl-wrap"><table class="tbl lb" id="lbMemlens"></table></div>
+      </div>
+      <div class="card board">
+        <h3>DMV-Bench</h3>
+        <p class="sub">Task success rate (%). The -lite rows are the benchmark's own re-implementations of published
+          systems; NoMemory, TextOnly and Caption are its baselines. J&nbsp;=&nbsp;50 uses its Monte-Carlo probe
+          construction. Systems are ranked by their mean over all eight settings; bold marks the best in each
+          column.</p>
+        <div class="tbl-wrap"><table class="tbl lb" id="lbDmv"></table></div>
+      </div>
+    </div>
   </div>
 </section>
 

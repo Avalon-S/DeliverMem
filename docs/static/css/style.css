@@ -324,6 +324,32 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 14.5px; }
 .tbl .muted { color: var(--ink-3); }
 .tbl tr:last-child td { border-bottom: 0; }
 
+/* ── full results ────────────────────────────────────── */
+.board-toggle { text-align: center; margin-top: 22px; }
+.board-toggle .chev { display: inline-block; font-size: 12px; transition: transform .2s; }
+.board-toggle [aria-expanded="true"] .chev { transform: rotate(180deg); }
+.boards { display: none; margin-top: 18px; }
+.boards.open { display: grid; gap: 22px; }
+.boards > .card { min-width: 0; }   /* without it the grid item grows to the table's width on phones */
+.board h3 { margin: 0 0 4px; font-size: 18px; }
+.board .sub { color: var(--ink-2); font-size: 14.5px; margin: 0 0 12px; }
+.tbl.lb th.num { text-align: right; }
+.tbl.lb th.grp-h { text-align: center; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.tbl.lb td { padding: 9px 12px; }
+.tbl.lb td.num { font-weight: 500; color: var(--ink-2); }
+.tbl.lb td.num.best { font-weight: 800; color: var(--ink); }
+.tbl.lb td.rk { color: var(--ink-3); text-align: right; width: 28px; font-variant-numeric: tabular-nums; }
+.tbl.lb .sys { font-weight: 600; white-space: nowrap; }
+.tbl.lb .sys small { display: block; font-weight: 400; font-size: 12.5px; color: var(--ink-3); white-space: normal;
+  min-width: 180px; }
+.tbl.lb tr.ours td { background: var(--red-faint); }
+.tbl.lb tr.ours .sys, .tbl.lb tr.ours td.num.best { color: var(--red); }
+.tbl.lb tr.grp td { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; font-weight: 700;
+  color: var(--ink-3); background: var(--bg-alt); padding: 8px 12px; }
+.tbl.lb tr.grp td span { text-transform: none; letter-spacing: 0; font-weight: 500; }
+.tbl.lb tr.delta td { border-top: 1.5px solid var(--line); }
+.tbl.lb tr.delta td.num { color: var(--red); font-weight: 700; }
+
 /* ── matrix ──────────────────────────────────────────── */
 .matrix { display: grid; grid-template-columns: 1.4fr 1fr 1fr; border: 1px solid var(--line); border-radius: var(--radius);
   overflow: hidden; background: #fff; box-shadow: var(--shadow); }

@@ -158,6 +158,147 @@ window.DM = {
    44.1,
    42.05,
    38.97
+  ],
+  "agents": [
+   {
+    "name": "Mem0",
+    "scores": [
+     31.79,
+     31.28,
+     30.26,
+     30.77
+    ],
+    "backbone": "Qwen3-8B",
+    "reads": "BLIP-2 captions"
+   },
+   {
+    "name": "MemOS",
+    "scores": [
+     30.26,
+     30.77,
+     31.28,
+     29.74
+    ],
+    "backbone": "Qwen3-8B",
+    "reads": "BLIP-2 captions"
+   },
+   {
+    "name": "MemAgent-7B",
+    "scores": [
+     32.82,
+     25.64,
+     28.21,
+     24.62
+    ],
+    "backbone": "Qwen2.5-7B",
+    "reads": "BLIP-2 captions"
+   },
+   {
+    "name": "Memory-T1",
+    "scores": [
+     28.72,
+     28.72,
+     30.26,
+     29.23
+    ],
+    "backbone": "Qwen2.5-3B",
+    "reads": "BLIP-2 captions"
+   },
+   {
+    "name": "M3-Agent",
+    "scores": [
+     19.49,
+     18.97,
+     19.49,
+     23.59
+    ],
+    "backbone": "Qwen2-VL-7B",
+    "reads": "one composite image per session"
+   },
+   {
+    "name": "M3C",
+    "scores": [
+     18.46,
+     17.95,
+     14.87,
+     16.92
+    ],
+    "backbone": "Qwen2-VL-2B",
+    "reads": "images"
+   },
+   {
+    "name": "M2A",
+    "scores": [
+     15.38,
+     15.9,
+     16.92,
+     16.41
+    ],
+    "backbone": "Qwen3-VL-8B",
+    "reads": "images"
+   }
+  ],
+  "lvlms": [
+   {
+    "name": "Qwen3.5-122B",
+    "own": false,
+    "scores": [
+     63.59,
+     59.49,
+     49.23,
+     null
+    ]
+   },
+   {
+    "name": "Qwen3-VL-30B-A3B",
+    "own": false,
+    "scores": [
+     58.46,
+     52.31,
+     50.77,
+     null
+    ]
+   },
+   {
+    "name": "Gemini-3.1-Pro",
+    "own": false,
+    "scores": [
+     55.38,
+     58.46,
+     58.46,
+     null
+    ]
+   },
+   {
+    "name": "GPT-5.4",
+    "own": false,
+    "scores": [
+     51.28,
+     56.92,
+     51.79,
+     null
+    ]
+   },
+   {
+    "name": "Qwen3-VL-8B",
+    "own": true,
+    "scores": [
+     50.77,
+     47.69,
+     34.36,
+     null
+    ]
+   },
+   {
+    "name": "Qwen3-VL-2B",
+    "own": false,
+    "scores": [
+     38.46,
+     35.38,
+     27.69,
+     null
+    ]
+   }
   ]
  },
  "dmv": {
