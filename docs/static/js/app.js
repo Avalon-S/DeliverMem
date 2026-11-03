@@ -6,12 +6,18 @@
 
   var D = window.DM;
   var SVGNS = "http://www.w3.org/2000/svg";
-  var RED = "#c7000b", CHAR = "#3b3b42", GREY = "#c8c8cd", INK2 = "#4a4a52", INK3 = "#8b8b93", LINE = "#ece6e6";
+  // Chart colours are theme tokens from style.css. SVG fill/stroke attributes cannot take var(), so el() puts
+  // them in the style property instead; a theme switch then recolours every chart without a redraw.
+  var RED = "var(--red)", CHAR = "var(--char)", GREY = "var(--grey)", INK = "var(--ink)", INK2 = "var(--ink-2)",
+    INK3 = "var(--ink-3)", LINE = "var(--line)", SURFACE = "var(--surface)";
 
   function $(id) { return document.getElementById(id); }
   function el(tag, attrs, parent) {
     var e = document.createElementNS(SVGNS, tag);
-    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    for (var k in attrs) {
+      if ((k === "fill" || k === "stroke") && String(attrs[k]).indexOf("var(") === 0) e.style.setProperty(k, attrs[k]);
+      else e.setAttribute(k, attrs[k]);
+    }
     if (parent) parent.appendChild(e);
     return e;
   }
@@ -142,7 +148,7 @@
     var kind = ["dense", "mixture of experts, 3B active", "dense"];
     rows.forEach(function (r, i) {
       var y0 = T + i * gh;
-      txt(svg, L - 16, y0 + 24, r.model, { "text-anchor": "end", "font-size": 15, "font-weight": 700, fill: "#1b1b1f" });
+      txt(svg, L - 16, y0 + 24, r.model, { "text-anchor": "end", "font-size": 15, "font-weight": 700, fill: INK });
       txt(svg, L - 16, y0 + 43, kind[i], { "text-anchor": "end", "font-size": 12.5, fill: INK3 });
       [["delivery", RED, r.delivery, r.dWL, r.dP, 0], ["retrieval", CHAR, r.retrieval, r.rWL, r.rP, 1]].forEach(function (b) {
         var y = y0 + 6 + b[5] * (bh + 6);
@@ -326,7 +332,7 @@
         var d = v.map(function (y, i) { return (i ? "L" : "M") + X(i) + "," + Y(y); }).join(" ");
         el("path", { d: d, fill: "none", stroke: col, "stroke-width": wdt, "stroke-linejoin": "round" }, svg);
         v.forEach(function (y, i) {
-          var c = el("circle", { cx: X(i), cy: Y(y), r: ours || dual ? 5 : 3.2, fill: "#fff", stroke: col, "stroke-width": ours || dual ? 2.4 : 1.6 }, svg);
+          var c = el("circle", { cx: X(i), cy: Y(y), r: ours || dual ? 5 : 3.2, fill: SURFACE, stroke: col, "stroke-width": ours || dual ? 2.4 : 1.6 }, svg);
           hover(c, "<b>" + s.name + ": " + y.toFixed(1) + "</b><br>" + (bb === "qwen" ? "Qwen2.5-VL-7B" : "Gemini 2.5 Flash") + ", J = " + J[i]);
         });
         if (ours || dual) txt(svg, X(J.length - 1) + 12, Y(v[v.length - 1]) + 4, s.name, { "font-size": 12.5, "font-weight": 700, fill: col });
@@ -444,7 +450,7 @@
     });
     M.lengths.forEach(function (len, i) {
       var y = T + i * gh + 6;
-      txt(svg, L - 14, y + 24, len, { "text-anchor": "end", "font-size": 15, "font-weight": 700, fill: "#1b1b1f" });
+      txt(svg, L - 14, y + 24, len, { "text-anchor": "end", "font-size": 15, "font-weight": 700, fill: INK });
       var a = el("rect", { x: L, y: y, width: Math.max(3, X(M.tokens[i]) - L), height: bh, rx: 4, fill: RED }, svg);
       txt(svg, X(M.tokens[i]) + 8, y + 14, thousands(M.tokens[i]), { "font-size": 13, "font-weight": 700, fill: RED });
       var b = el("rect", { x: L, y: y + bh + 6, width: X(M.full[i]) - L, height: bh, rx: 4, fill: GREY }, svg);
